@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import firebase from 'firebase'
+// import firebase from 'firebase'
 import {database} from './main'
 
 export default {
@@ -28,16 +28,30 @@ export default {
   },
   data() {
     return {
-      items: [
-          { age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
-          { age: 21, first_name: 'Larsen', last_name: 'Shaw' },
-          { age: 89, first_name: 'Geneva', last_name: 'Wilson' },
-          { age: 38, first_name: 'Jami', last_name: 'Carney' }
-      ]
+        temperatureData: []
     }
   }, 
   created() {
-    const infoRef = database.ref('').child('')
+    const listRef = database.ref('list')
+
+      listRef.limitToLast(1).on('value', querySnapshot => {
+      let data = querySnapshot.val();
+      let value = Object.values(data);
+      // eslint-disable-next-line no-console
+      console.log(data);
+      // eslint-disable-next-line no-console
+      console.log(value);
+
+     
+      this.temperatureData.push({"test":"success!"})
+      if (this.temperatureData.length > 8) {
+        this.temperatureData = this.temperatureData.slice(this.temperatureData.length - 8, this.temperatureData.length)
+      }
+      
+      this.$refs.temperatureChart.updateSeries([{
+        data: this.temperatureData
+      }])
+    });
   }
 }
 </script>
