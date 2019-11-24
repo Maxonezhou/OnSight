@@ -2,30 +2,26 @@
 // Created by Patrick Li on 2019-11-16.
 //
 
-#ifndef PROJECT_4__MYVECTOR_H_
-#define PROJECT_4__MYVECTOR_H_
-
-#include <iostream>
-
-using namespace std;
+#ifndef PROJECT_4__Vector_H_
+#define PROJECT_4__Vector_H_
 
 template<class T>
-class myVector {
+class Vector {
  public:
   int capacity;
   T *arr;
 
-  myVector() {
+  Vector() {
 	capacity = 0;
 	arr = new T[capacity];
   }
 
-  ~myVector() {
+  ~Vector() {
     delete[] arr;
     capacity = 0;
   }
 
-  myVector(myVector &v) {
+  Vector(Vector &v) {
 	capacity = v.capacity;
 	arr = new T[capacity];
 	for (int i = 0; i < capacity; i++) {
@@ -35,7 +31,7 @@ class myVector {
 
   void push_back(T val) {
 	int sz = capacity;
-	myVector old(*this);
+	Vector old(*this);
 
 	delete[] arr;
 	arr = new T[sz + 1];
@@ -48,13 +44,13 @@ class myVector {
 	arr[sz] = val;
   }
 
-  void print() {
-	cout << "[";
-	for (int i = 0; i < capacity - 1; i++) {
-	  cout << arr[i] << ", ";
-	}
-	cout << arr[capacity - 1] << "]" << endl;
-  }
+//   void print() {
+// 	cout << "[";
+// 	for (int i = 0; i < capacity - 1; i++) {
+// 	  cout << arr[i] << ", ";
+// 	}
+// 	cout << arr[capacity - 1] << "]" << endl;
+//   }
 
   int size() {
 	return capacity;
@@ -62,7 +58,7 @@ class myVector {
 
   T &operator[](int idx) {
 	if (idx >= capacity) {
-	  throw out_of_range("OUT OF BOUNDS");
+	  //throw out_of_range("OUT OF BOUNDS");
 	}
 	else {
 	  return arr[idx];
@@ -71,7 +67,7 @@ class myVector {
 
   const T &operator[](int idx) const {
 	if (idx >= capacity) {
-	  cout << "OUT OF BOUNDS" << endl;
+	  //cout << "OUT OF BOUNDS" << endl;
 	  return nullptr;
 	}
 	else {
@@ -80,4 +76,4 @@ class myVector {
   }
 };
 
-#endif //PROJECT_4__MYVECTOR_H_
+#endif //PROJECT_4__Vector_H_

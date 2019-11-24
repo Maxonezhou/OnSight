@@ -4,14 +4,19 @@
 #include <ESP8266HTTPClient.h>
 #include <FirebaseArduino.h>
 //#include <ArduinoJson.h>
-#include <SPI.h>
-#include <Vector.h>
-#include <Wire.h>
+// #include <SPI.h>
+// //#include <Vector.h>
+// #include <Wire.h>
+
+#include <PatrickVector.h>
+// #include <displayText.h>
 
 //#include "Credentials.h"
 
-#define SSID "HackWestern6"
-#define PASSWORD "42259378376"
+// #define SSID "HackWestern6"
+// #define PASSWORD "42259378376"
+#define SSID "15 Barrington"
+#define PASSWORD "ourhappylittlehome"
 
 #define FIREBASE_HOST "onsight-88888.firebaseio.com"
 #define FIREBASE_AUTH "EVixsuIwzMaTEtOcECwnvSoTiI0Mb7NcRBCM7Hjs"
@@ -19,8 +24,13 @@
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 
+
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+
 // Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
-#define OLED_RESET LED_BUILTIN // Reset pin # (or -1 if sharing Arduino reset pin)
+#define OLED_RESET     LED_BUILTIN // Reset pin # (or -1 if sharing Arduino reset pin)
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 struct Data
@@ -38,6 +48,7 @@ struct Data
     situation = "";
   }
 };
+
 
 struct PQ
 {
@@ -76,6 +87,116 @@ struct PQ
   }
 };
 
+
+
+//Patrick's functions:
+
+
+
+
+
+void drawchar(String s, int size) {
+  display.clearDisplay();
+
+  display.setTextSize(size);      // Normal 1:1 pixel scale
+  display.setTextColor(SSD1306_WHITE); // Draw white text
+  display.setCursor(0, 0);     // Start at top-left corner
+  display.cp437(true);         // Use full 256 char 'Code Page 437' font
+
+  for (int i = 0; i < s.length(); i++) {
+      display.write(s[i]);
+  }
+  display.display();
+}
+
+void drawstyles(String s) {
+  display.clearDisplay();
+
+  display.setTextSize(1);             // Normal 1:1 pixel scale
+  display.setTextColor(SSD1306_WHITE);        // Draw white text
+  display.setCursor(0,0);             // Start at top-left corner
+//   display.println(F(s));
+  display.display();
+  delay(2000);
+}
+
+void drawscroll(String s) {
+  display.clearDisplay();
+
+  display.setTextSize(2); // Draw 2X-scale text
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(10, 0);
+//   display.println(F(s));
+  display.display();      // Show initial text
+  delay(100);
+
+  // Scroll in various directions, pausing in-between:
+  display.startscrollright(0x00, 0x0F);
+  delay(2000);
+  display.stopscroll();
+  delay(1000);
+  display.startscrollleft(0x00, 0x0F);
+  delay(2000);
+  display.stopscroll();
+  delay(1000);
+  display.startscrolldiagright(0x00, 0x07);
+  delay(2000);
+  display.startscrolldiagleft(0x00, 0x07);
+  delay(2000);
+  display.stopscroll();
+  delay(1000);
+}
+
+
+
+void displayMessage(struct Data* data) {
+    String details = String(data->details);
+    int emergencyInt = data->emergency_level;
+    String location = String(data->location);
+    String situation = String(data->situation);
+
+    char d[details.length() + 1];
+	  strcpy(d, details.c_str());
+
+    char l[location.length() + 1];
+	  strcpy(l, location.c_str());
+
+    char s[situation.length() + 1];
+	  strcpy(s, situation.c_str());
+
+    drawchar(details, 2);
+
+    delay(5000);
+
+    String emergency = "Emergency Level: " + String(emergencyInt); //concatenate to make emergency string
+    char e[emergency.length() + 1];
+	  strcpy(e, emergency.c_str());
+    drawchar(e, 2);
+
+    delay(5000);
+
+    drawchar(location, 2);
+
+    delay(5000);
+
+    drawchar(situation, 2);
+
+    delay(3000);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void ConnectToWiFi()
 {
     delay(100);
@@ -112,6 +233,15 @@ void ConnectToWiFi()
   String location = "";
   String situation = "";
 
+  char emergency_arr[] = "emergency_level";
+  char* emergency_comp = emergency_arr;
+  char details_arr[] = "details";
+  char* details_comp = details_arr;
+  char location_arr[] = "location";
+  char* location_comp = location_arr;
+  char situation_arr[] = "situation";
+  char* situation_comp = situation_arr;
+
 void setup() 
 {
   Serial.begin(115200);
@@ -129,32 +259,7 @@ void setup()
   }
 
   Firebase.stream("/list");
-
-
-  //display initialization
-  Serial.begin(115200);
-
-  // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
-  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
-    Serial.println(F("SSD1306 allocation failed"));
-    for(;;); // Don't proceed, loop forever
-  }
-
-  // Show initial display buffer contents on the screen --
-  // the library initializes this with an Adafruit splash screen.
-  display.display();
-  delay(2000); // Pause for 2 seconds
-
-  // Clear the buffer
-  display.clearDisplay();
-
-  // Draw a single pixel in white
-  display.drawPixel(10, 10, SSD1306_WHITE);
-
-  // Show the display buffer on the screen. You MUST call display() after
-  // drawing commands to make them visible on screen!
-  display.display();
-  delay(2000);
+  
 }
  
 void loop() 
@@ -181,28 +286,28 @@ void loop()
        Serial.println(it->key);
        Serial.print("[INFO] it->value: ");
        Serial.println(it->value.as<char*>());
-       for(const auto& kv : it->value.as<String>()) {
+       for(const auto& kv : it->value.as<JsonObject>()) {
           Serial.print("[INFO] kv.key: ");
           Serial.println(kv.key);
           Serial.print("[INFO] kv.value: ");
           Serial.println(kv.value.as<String>());
 
-          if (kv.value.as<String>() == "emergency_level")
+          if (strcmp(kv.key, emergency_comp) == 0)
           {
             Serial.println("1");
             emergency_level = kv.value.as<String>();
           }
-          if (kv.value.as<String>() == "location")
+          if (strcmp(kv.key, location_comp) == 0)
           {
             Serial.println("2");
             location = kv.value.as<String>();
           }
-          if (kv.value.as<String>() == "situation")
+          if (strcmp(kv.key, situation_comp) == 0)
           {
             Serial.println("3");
             situation = kv.value.as<String>();
           }
-          if (kv.value.as<String>() == "details")
+          if (strcmp(kv.key, details_comp) == 0)
           {
             Serial.println("4");
             details = kv.value.as<String>();
@@ -219,58 +324,21 @@ void loop()
              temp->location = location;
 
              glasses->storage.push_back(*temp);
+             for (int i = glasses->storage.size() - 1; i >= 0; i--)
+             {
+               glasses->Min_Heapify(i);
+             }
+             Serial.println(glasses->storage.size());
 
             Serial.print("details: ");
-            Serial.println(details);
+            Serial.println(glasses->storage[0].details);
             Serial.print("emergency_level: ");
-            Serial.println(emergency_level);
+            Serial.println(glasses->storage[0].emergency_level);
             Serial.print("situation: ");
-            Serial.println(situation);
+            Serial.println(glasses->storage[0].situation);
             Serial.print("location: ");
-            Serial.println(location);
+            Serial.println(glasses->storage[0].location);
           }
-        // if (counter % 2 == 0)
-        // {
-        //   if (for_counter % 2 == 0)
-        //   {
-        //     emergency_level = kv.value.as<String>();
-        //     for_counter++;
-        //   }
-        //   else if (for_counter % 2 == 1)
-        //   {
-        //     location = kv.value.as<String>();
-        //     for_counter++;
-        //   }
-        // }
-        // else if (counter % 2 == 1)
-        // {
-        //   if (for_counter % 2 == 0)
-        //   {
-        //     situation = kv.value.as<String>();
-        //     for_counter++;
-        //   }
-        //   else if (for_counter % 2 == 1)
-        //   {
-        //     details = kv.value.as<String>();
-        //     for_counter++;
-        //     Data* temp = new Data();
-        //     temp->details = details;
-        //     temp->emergency_level = emergency_level.toInt();
-        //     temp->situation = situation;
-        //     temp->location = location;
-
-        //     Serial.print("details: ");
-        //     Serial.println(details);
-        //     Serial.print("emergency_level: ");
-        //     Serial.println(emergency_level);
-        //     Serial.print("situation: ");
-        //     Serial.println(situation);
-        //     Serial.print("location: ");
-        //     Serial.println(location);
-
-        //     glasses->storage.push_back(*temp);
-        //   }
-        //}
       }
     }
       
@@ -295,9 +363,12 @@ void loop()
   {
     for (int i = 0; i < glasses->storage.size(); i++)
     {
-      display.clearDisplay();
+      displayMessage(&(glasses->storage[i]));
 
     }
   }
   delay(1000);
 }
+
+
+

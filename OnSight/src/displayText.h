@@ -11,18 +11,45 @@
 #define OLED_RESET     LED_BUILTIN // Reset pin # (or -1 if sharing Arduino reset pin)
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
-void displayMessage(struct Data* data) {
-    String details = data->details;
-    int emergency_level = data->emergency_level;
-    String location = data->location;
-    String situation = data->situation;
 
-    if (details.length() <= 15) { //if <15, it should fit on a single line
-        drawchar(details);
-    }
-    else { //otherwise, we display it as scorlling text
-        drawscroll(details);
-    }
+struct Data
+{
+  String details;
+  int emergency_level;
+  String location;
+  String situation;
+
+  Data()
+  {
+    details = "";
+    emergency_level = 0;
+    location = "";
+    situation = "";
+  }
+};
+
+void displayMessage(struct Data* data) {
+    String details = String(data->details);
+    int emergency_level = String(data->emergency_level);
+    String location = String(data->location);
+    String situation = String(data->situation);
+
+    char d[details.size() + 1];
+	strcpy(d, details.c_str());
+
+    char e[emergency.size() + 1];
+	strcpy(e, emergency.c_str());
+
+    char e[1];
+    sprintf(e, "%d", emergency_level);
+
+    char l[10];
+	strcpy(l, location.c_str());
+
+    char s[situation.size() + 1];
+	strcpy(s, situation.c_str());
+
+    drawchar(details);
 
     delay(5000);
 
@@ -31,21 +58,11 @@ void displayMessage(struct Data* data) {
 
     delay(5000);
 
-    if (location.length() <= 15) {
-        drawchar(location);
-    }
-    else {
-        drawscroll(location);
-    }
+    drawchar(location);
 
     delay(5000);
 
-    if (situation.length() <= 15) {
-        drawchar(situation);
-    }
-    else {
-        drawscroll(situation);
-    }
+    drawchar(situation);
 }
 
 
@@ -69,7 +86,7 @@ void drawstyles(String s) {
   display.setTextSize(1);             // Normal 1:1 pixel scale
   display.setTextColor(SSD1306_WHITE);        // Draw white text
   display.setCursor(0,0);             // Start at top-left corner
-  display.println(F(s));
+//   display.println(F(s));
   display.display();
   delay(2000);
 }
@@ -80,7 +97,7 @@ void drawscroll(String s) {
   display.setTextSize(2); // Draw 2X-scale text
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(10, 0);
-  display.println(F(s));
+//   display.println(F(s));
   display.display();      // Show initial text
   delay(100);
 
