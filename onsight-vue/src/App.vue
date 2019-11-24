@@ -15,7 +15,7 @@
         <th>Location</th>
         <th>Contact</th>
       </thead>
-      <tr v-for="info in infoList" :key="info.emergency_level">
+      <tr v-for="info in infoList.reverse()" :key="info.emergency_level">
         <td>{{info.situation}}</td>
         <td>{{info.emergency_level}}</td>
         <td>{{info.location}}</td>
@@ -72,6 +72,7 @@ export default {
   
       
     })
+    
 
   },
   methods: {
