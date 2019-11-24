@@ -1,19 +1,41 @@
 <template>
   <div id="app">
-    <b-jumbotron header="OnSight" style="width: 50%; margin: 0 auto; opacity: 0.9;" lead="Novel Approach for First Responders">
-       <b-img class="logo" rounded alt="Rounded image" thumbnail src="https://i.ibb.co/7jJV8C2/logo.png"></b-img>
-        <!-- <img style="opacity: 1" src="https://image.flaticon.com/icons/svg/206/206877.svg" height="200px"></img> -->
-        <!-- <p>For more information visit website</p>
-        <b-button variant="primary" href="#">More Info</b-button> -->
-      </b-jumbotron>
-    <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
-    <b-table striped hover :items="items"></b-table>
-    <b-input-group prepend="Send Report" class="mt-5">
-       <b-form-input></b-form-input>
-      <b-input-group-append>
-        <b-button variant="primary">Enter</b-button>
-      </b-input-group-append>
-    </b-input-group>
+    <h1>OnSight Dashboard</h1>
+    <div style="h-50">
+      <img id="logo" src="https://image.flaticon.com/icons/svg/763/763421.svg">
+    </div>
+    <h3 id="description">Reimagining Emergency Response</h3>
+  
+    <table class="table">
+      <thead id="tableHead">
+        <th>Situation</th>
+        <th>Emergency Level</th>
+        <th>Location</th>
+        <th>Details</th>
+        <th>Location</th>
+        <th>Contact</th>
+      </thead>
+      <tr v-for="info in infoList.reverse()" :key="info.emergency_level">
+        <td>{{info.situation}}</td>
+        <td>{{info.emergency_level}}</td>
+        <td>{{info.location}}</td>
+        <td>{{info.details}}</td>
+        <td> 
+          <iframe
+            width="600"
+            height="450"
+            frameborder="0" style="border:0"
+            v-bind:src="getUrl(info.location)" allowfullscreen>
+          </iframe>
+        </td>
+        <td>
+          <div id=contactText> 
+            <strong>Contact Closest First Responder    </strong>
+            <b-button block variant="danger">CONTACT</b-button>
+          </div>
+        </td>
+      </tr>
+    </table>
   </div>
 </template>
 
@@ -28,35 +50,43 @@ export default {
   },
   data() {
     return {
-        temperatureData: []
+      infoData: '',
+      infoList: []
     }
   }, 
   created() {
-    const listRef = database.ref('list')
+    const infoRef = database.ref('list')
 
-      listRef.limitToLast(1).on('value', querySnapshot => {
-      let data = querySnapshot.val();
-      let value = Object.values(data);
-      // eslint-disable-next-line no-console
-      console.log(data);
-      // eslint-disable-next-line no-console
-      console.log(value);
+    infoRef.limitToLast(1).on('value', data => {
+      let fireBaseVal = data.val();
+      let value = Object.values(fireBaseVal);
 
-     
-      this.temperatureData.push({"test":"success!"})
-      if (this.temperatureData.length > 8) {
-        this.temperatureData = this.temperatureData.slice(this.temperatureData.length - 8, this.temperatureData.length)
-      }
+      console.log(value[0]);
+
       
-      this.$refs.temperatureChart.updateSeries([{
-        data: this.temperatureData
-      }])
-    });
+      value.forEach(val => {
+        if(value[0].situation != undefined) {
+          this.infoList.push(val);
+        }
+      })
+  
+      
+    })
+    
+
+  },
+  methods: {
+    getUrl(location) {  
+      // API key will be deactivated immediately after so no need for environment variables to keep it simple
+      return "https://www.google.com/maps/embed/v1/place?key=AIzaSyCwcjGNNNbFM71APT-x_37YYqexjDTrBTM&q="+ location
+    }
+
   }
 }
 </script>
 
 <style>
+
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -66,7 +96,19 @@ export default {
   margin-top: 60px;
 }
 
+#logo {
+  height: 150px;
+}
+
+#contactText {
+  font-size: 1pc;
+  align-content: center
+}
+
+#description {
+  padding: 20px 20px 20px 20px
+}
 .logo {
-  height:350px;
+  height:200px;
 }
 </style>
