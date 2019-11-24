@@ -1,9 +1,15 @@
 import Vue from 'vue'
+import { firestorePlugin } from 'vuefire'
 import App from './App.vue'
-import BootstrapVue from 'bootstrap-vue'
 
 import firebase from 'firebase'
+import BootstrapVue from 'bootstrap-vue';
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
 
+Vue.config.productionTip = false
+Vue.use(BootstrapVue)
+Vue.use(firestorePlugin)
 let firebaseConfig = {
   // API key will be deactivated immediately after hackathon so we're exposing it only for the duration of the hackathon.
   apiKey: "AIzaSyD5lEVKITzfAzKcK1wK_FY48uvRv-DDlIw",
@@ -15,10 +21,7 @@ let firebaseConfig = {
   appId: "1:314172702462:web:8f9495c28a36557e5fefaf"
 };
 
-firebase.initializeApp(firebaseConfig)
-
-Vue.use(BootstrapVue)
-Vue.config.productionTip = false
+firebase.initializeApp(firebaseConfig);
 
 export var database = firebase.database();
 new Vue({
