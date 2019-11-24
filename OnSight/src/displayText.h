@@ -17,16 +17,16 @@ void displayMessage(struct Data* data) {
     String location = data->location;
     String situation = data->situation;
 
-    if (details.length() <= 15) {
+    if (details.length() <= 15) { //if <15, it should fit on a single line
         drawchar(details);
     }
-    else {
+    else { //otherwise, we display it as scorlling text
         drawscroll(details);
     }
 
     delay(5000);
 
-    String emergency = "Emergency Level: " + emergency_level;
+    String emergency = "Emergency Level: " + emergency_level; //concatenate to make emergency string
     drawchar(emergency);
 
     delay(5000);
