@@ -104,7 +104,7 @@ void ConnectToWiFi()
     Serial.println("");
 }
 
-  PQ* info = new PQ();
+  PQ* glasses = new PQ();
   int counter = 0;
   int for_counter = 0;
   String details = "";
@@ -134,6 +134,11 @@ void setup()
  
 void loop() 
 {
+  display.clearDisplay();
+  display.setTextSize(2);
+  display.setTextColor(WHITE);
+  display.setCursor(0,0);
+  display.println("Hello, World!");
   
   if (Firebase.failed()) 
   {
@@ -151,49 +156,99 @@ void loop()
        Serial.println(it->key);
        Serial.print("[INFO] it->value: ");
        Serial.println(it->value.as<char*>());
-       for(const auto& kv : it->value.as<JsonObject>()) {
-         Serial.print("[INFO] kv.key: ");
-         Serial.println(kv.key);
-         Serial.print("[INFO] kv.value: ");
-         Serial.println(kv.value.as<String>());
+       for(const auto& kv : it->value.as<String>()) {
+          Serial.print("[INFO] kv.key: ");
+          Serial.println(kv.key);
+          Serial.print("[INFO] kv.value: ");
+          Serial.println(kv.value.as<String>());
 
-        if (counter % 2 == 0)
-        {
-          if (for_counter % 2 == 0)
+          if (kv.value.as<String>() == "emergency_level")
           {
+            Serial.println("1");
             emergency_level = kv.value.as<String>();
-            for_counter++;
           }
-          else if (for_counter % 2 == 1)
+          if (kv.value.as<String>() == "location")
           {
+            Serial.println("2");
             location = kv.value.as<String>();
-            for_counter++;
           }
-        }
-        else if (counter % 2 == 1)
-        {
-          if (for_counter % 2 == 0)
+          if (kv.value.as<String>() == "situation")
           {
+            Serial.println("3");
             situation = kv.value.as<String>();
-            for_counter++;
           }
-          else if (for_counter % 2 == 1)
+          if (kv.value.as<String>() == "details")
           {
+            Serial.println("4");
             details = kv.value.as<String>();
-            for_counter++;
-            Data* temp = new Data();
-            temp->details = details;
-            temp->emergency_level = emergency_level.toInt();
-            temp->situation = situation;
-            temp->location = location;
-
-            info->storage.push_back(*temp);
           }
-        }
-       }
-     }
-      Serial.println("exited");
-      counter++;
+          if ((emergency_level != "") && 
+              (location != "") &&
+              (situation != "") &&
+              (details != ""))
+          {
+            Data* temp = new Data();
+             temp->details = details;
+             temp->emergency_level = emergency_level.toInt();
+             temp->situation = situation;
+             temp->location = location;
+
+             glasses->storage.push_back(*temp);
+
+            Serial.print("details: ");
+            Serial.println(details);
+            Serial.print("emergency_level: ");
+            Serial.println(emergency_level);
+            Serial.print("situation: ");
+            Serial.println(situation);
+            Serial.print("location: ");
+            Serial.println(location);
+          }
+        // if (counter % 2 == 0)
+        // {
+        //   if (for_counter % 2 == 0)
+        //   {
+        //     emergency_level = kv.value.as<String>();
+        //     for_counter++;
+        //   }
+        //   else if (for_counter % 2 == 1)
+        //   {
+        //     location = kv.value.as<String>();
+        //     for_counter++;
+        //   }
+        // }
+        // else if (counter % 2 == 1)
+        // {
+        //   if (for_counter % 2 == 0)
+        //   {
+        //     situation = kv.value.as<String>();
+        //     for_counter++;
+        //   }
+        //   else if (for_counter % 2 == 1)
+        //   {
+        //     details = kv.value.as<String>();
+        //     for_counter++;
+        //     Data* temp = new Data();
+        //     temp->details = details;
+        //     temp->emergency_level = emergency_level.toInt();
+        //     temp->situation = situation;
+        //     temp->location = location;
+
+        //     Serial.print("details: ");
+        //     Serial.println(details);
+        //     Serial.print("emergency_level: ");
+        //     Serial.println(emergency_level);
+        //     Serial.print("situation: ");
+        //     Serial.println(situation);
+        //     Serial.print("location: ");
+        //     Serial.println(location);
+
+        //     glasses->storage.push_back(*temp);
+        //   }
+        //}
+      }
+    }
+      
        /*display.clearDisplay();
        display.setTextSize(2);
        display.setTextColor(WHITE);
@@ -201,6 +256,23 @@ void loop()
        display.println(path.c_str()+1);
        display.println(emergency_level);
        display.display();*/
+  }
+  if (glasses->storage.size() == 0)
+  {
+    display.clearDisplay();
+    display.setTextSize(2);
+    display.setTextColor(WHITE);
+    display.setCursor(0,0);
+    display.println("Hello, World!");
+    Serial.println("enter");
+  }
+  else
+  {
+    for (int i = 0; i < glasses->storage.size(); i++)
+    {
+      display.clearDisplay();
+
+    }
   }
   delay(1000);
 }
