@@ -3,27 +3,17 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <FirebaseArduino.h>
-//#include <ArduinoJson.h>
-// #include <SPI.h>
-// //#include <Vector.h>
-// #include <Wire.h>
 
 #include <PatrickVector.h>
-// #include <displayText.h>
 
-//#include "Credentials.h"
-
-// #define SSID "HackWestern6"
-// #define PASSWORD "42259378376"
-#define SSID "15 Barrington"
-#define PASSWORD "ourhappylittlehome"
+#define SSID "HackWestern6"
+#define PASSWORD "42259378376"
 
 #define FIREBASE_HOST "onsight-88888.firebaseio.com"
 #define FIREBASE_AUTH "EVixsuIwzMaTEtOcECwnvSoTiI0Mb7NcRBCM7Hjs"
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
-
 
 #include <SPI.h>
 #include <Wire.h>
@@ -87,14 +77,6 @@ struct PQ
   }
 };
 
-
-
-//Patrick's functions:
-
-
-
-
-
 void drawchar(String s, int size) {
   display.clearDisplay();
 
@@ -147,8 +129,6 @@ void drawscroll(String s) {
   delay(1000);
 }
 
-
-
 void displayMessage(struct Data* data) {
     String details = String(data->details);
     int emergencyInt = data->emergency_level;
@@ -183,19 +163,6 @@ void displayMessage(struct Data* data) {
 
     delay(3000);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 void ConnectToWiFi()
 {
@@ -341,14 +308,7 @@ void loop()
           }
       }
     }
-      
-       /*display.clearDisplay();
-       display.setTextSize(2);
-       display.setTextColor(WHITE);
-       display.setCursor(0,0);
-       display.println(path.c_str()+1);
-       display.println(emergency_level);
-       display.display();*/
+
   }
   if (glasses->storage.size() == 0)
   {
@@ -369,6 +329,3 @@ void loop()
   }
   delay(1000);
 }
-
-
-
